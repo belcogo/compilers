@@ -13,6 +13,19 @@ class SampleClass {
 
     bool teste(bool a, bool b) {
         if (a < b)
-            a = b;
+          a = b;
+        ; else 
+          b = a;
+        ;
+
+        if (a == b)
+          if (b)
+            return a;
+          ;
+          else return b;;
+        ;
+        else
+          return True;
+        ;
     }
 }
