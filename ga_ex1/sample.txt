@@ -1,0 +1,18 @@
+class SampleClass {
+    int a;
+    bool b;
+    int sum = 0;
+
+    int soma (int x, int y) {
+        return x + y;
+    }
+
+    void printSample(int value) {
+        print(value);
+    }
+
+    bool teste(bool a, bool b) {
+        if (a < b)
+            a = b;
+    }
+}

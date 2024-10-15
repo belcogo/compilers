@@ -1,0 +1,46 @@
+S -> SS + | SS * | a
+-----------------------------------------
+aa+a*
+-----------------------------------------
+ESQ
+S -> SS * -> SS + S * -> aS + S * -> aa + S * -> aa + a * => aa+a*
+------------------------------------------------------------------
+DIR
+S -> SS * -> Sa * -> SS + a * -> Sa + a * -> aa + a * => aa+a*
+------------------------------------------------------------------
+ARVORE
+                              S
+                    S         S         *
+                S   S   +     a 
+                a   a
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+bexpr -> bexpr or bterm | bterm
+bterm -> bterm and bfactor | bfactor
+bfactor -> not bfactor | (bexpr) | true | false
+-----------------------------------------------
+not (true or false)
+-----------------------------------------------
+ESQ
+bexpr -> bterm -> bfactor -> not bfactor -> not (bexpr)
+-> not (bexpr or bterm) -> not (bterm or bterm) -> not (bfactor or bterm)
+-> not (true or bterm) -> not (true or bfactor) -> not (true or false)
+-------------------------------------------------------------------------
+DIR
+bexpr -> bterm -> bfactor -> not bfactor -> not (bexpr)
+-> not (bexpr or bterm) -> not (bexpr or bfactor) -> not (bexpr or false)
+-> not (bterm or false) -> not (bfactor or false) -> not (true or false)
+-------------------------------------------------------------------------
+ARVORE
+                       bexpr
+                       bterm
+                       bfactor
+        not                              bfactor
+                                         (bexpr)
+            (           bexpr              or               bterm             )
+                        bterm                               bfactor
+                        bfactor                             false
+                        true
+
+
