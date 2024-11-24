@@ -16,12 +16,12 @@ public class Main {
     String outputFile = args[1];
 
     // Inicializa o Lexer e o Parser
-    SyntacticAnalyserLexer lexer = new SyntacticAnalyserLexer(input);
+    SyntacticAnalyserLexer lexer = new SyntacticAnalyserLexer(inputFile);
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     SyntacticAnalyserParser parser = new SyntacticAnalyserParser(tokens);
 
     // Gera a árvore sintática
-    ParseTree tree = parser.program();
+    ParseTree tree = parser.prog();
 
     // Constrói a tabela de símbolos
     SyntacticAnalyserListener listener = new SyntacticAnalyserListener();
@@ -29,24 +29,24 @@ public class Main {
     walker.walk(listener, tree);
 
     // Recupera e imprime a tabela de símbolos
-    SymbolTable symbolTable = listener.getSymbolTable();
+    SymbolTable st = listener.getSymbolTable();
     System.out.println("Tabela de Símbolos:");
     // System.out.println(symbolTable);
 
-    SymbolTable treeAddressCode = listener.getTreeAddressCode();
+    TreeAddressCode tac = listener.getTreeAddressCode();
     System.out.println("TAC:");
     // System.out.println(treeAddressCode);
 
-    writeFile(outputFile, symbolTable, treeAddressCode);
+    writeFile(outputFile, st, tac);
   }
 
-  private static void writeFile(String outputFile, String symbolTable, String tac) throws IOException {
+  private static void writeFile(String outputFile, String st, String tac) throws IOException {
     try (FileWriter writer = new FileWriter(outputFile)) {
       // Escreve tabela de símbolos
       writer.write("==============================\n");
       writer.write("Tabela de Símbolos:\n");
       writer.write("==============================\n");
-      writer.write(symbolTable);
+      writer.write(st);
 
       // Escreve TAC
       writer.write("\n==============================\n");
