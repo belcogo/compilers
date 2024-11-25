@@ -1,9 +1,10 @@
 package SyntacticAnalyser;
 
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TreeAddressCode {
-  public static StringBuilder treeAddressCode = new StringBuilder();
+  protected StringBuilder treeAddressCode = new StringBuilder();
   private AtomicInteger labelL = new AtomicInteger();
   private AtomicInteger labelT = new AtomicInteger(); 
 

@@ -1,10 +1,11 @@
 package SyntacticAnalyser;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class SymbolTable {
-  private Map<String, String> symbols = new HashMap<>();
+  protected Map<String, String> symbols = new HashMap<>();
 
   public void addSymbol(String name, String type) {
     symbols.put(name, type);
@@ -12,6 +13,10 @@ public class SymbolTable {
 
   public String getSymbol(String name) {
     return symbols.get(name);
+  }
+
+  public Boolean alreadyExists(String name) {
+    return symbols.containsKey(name);
   }
 
   @Override

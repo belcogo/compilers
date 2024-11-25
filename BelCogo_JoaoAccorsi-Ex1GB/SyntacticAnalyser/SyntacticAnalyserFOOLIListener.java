@@ -1,5 +1,6 @@
 package SyntacticAnalyser;
 
+
 import SyntacticAnalyser.SyntacticAnalyserParser.*;
 
 public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListener {
@@ -16,7 +17,6 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
 
   @Override
   public void enterArguments(ArgumentsContext ctx) {
-    // TODO Auto-generated method stub
     super.enterArguments(ctx);
   }
   @Override
@@ -126,7 +126,14 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
   }
   @Override
   public void exitArguments(ArgumentsContext ctx) {
-    // TODO Auto-generated method stub
+    if (ctx.attr_declaration() != null) {
+      exitAttr_declaration(ctx.attr_declaration());
+    }
+
+    if (ctx.arguments() != null) {
+      exitArguments(ctx.arguments());
+    }
+
     super.exitArguments(ctx);
   }
   @Override
@@ -136,7 +143,19 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
   }
   @Override
   public void exitAttr_declaration(Attr_declarationContext ctx) {
-    // TODO Auto-generated method stub
+    String type = ctx.type().getText();
+    String name = ctx.IDENTIFIER().getText();
+
+    if (type != null &&st.alreadyExists(name)) {
+      throw new RuntimeException("Erro semântico: variável " + name + " já declarada.");
+    }
+    
+    st.addSymbol(name, type);
+
+    if (ctx.exp_one() != null) {
+      exitExp_one(ctx.exp_one());
+    }
+    
     super.exitAttr_declaration(ctx);
   }
   @Override
@@ -166,22 +185,51 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
   }
   @Override
   public void exitExp_four(Exp_fourContext ctx) {
-    // TODO Auto-generated method stub
+    if (ctx.IDENTIFIER() != null) {
+      String idName = ctx.IDENTIFIER().getText();
+      String type = "Identifier";
+
+      st.addSymbol(idName, type);
+    }
+    if (ctx.boolean_constants() != null) {
+      String number = ctx.boolean_constants().getText();
+      String type = "bool";
+
+      st.addSymbol(number, type);
+    }
     super.exitExp_four(ctx);
   }
   @Override
   public void exitExp_one(Exp_oneContext ctx) {
-    // TODO Auto-generated method stub
+    if (ctx.exp_two() != null) {
+      exitExp_two(ctx.exp_two());
+    }
     super.exitExp_one(ctx);
   }
   @Override
   public void exitExp_three(Exp_threeContext ctx) {
-    // TODO Auto-generated method stub
+    if (ctx.IDENTIFIER() != null) {
+      String idName = ctx.IDENTIFIER().getText();
+      String type = "Identifier";
+
+      st.addSymbol(idName, type);
+    }
+    if (ctx.NUMBER() != null) {
+      String number = ctx.NUMBER().getText();
+      String type = "int";
+
+      st.addSymbol(number, type);
+    }
     super.exitExp_three(ctx);
   }
   @Override
   public void exitExp_two(Exp_twoContext ctx) {
-    // TODO Auto-generated method stub
+    if (ctx.relational_op() != null) exitRelational_op(ctx.relational_op());
+    if (ctx.logic_op() != null) exitLogic_op(ctx.logic_op());
+    if (ctx.aritmetic_op() != null) exitAritmetic_op(ctx.aritmetic_op());
+    if (ctx.exp_three() != null) exitExp_three(ctx.exp_three());
+    if (ctx.exp_four() != null) exitExp_four(ctx.exp_four());
+
     super.exitExp_two(ctx);
   }
   @Override
@@ -221,7 +269,11 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
   }
   @Override
   public void exitRelational_op(Relational_opContext ctx) {
-    // TODO Auto-generated method stub
+    if (ctx.exp_three() != null) exitExp_three(ctx.exp_three());
+
+    if (ctx.exp_three(0) != null) {
+
+    }
     super.exitRelational_op(ctx);
   }
   @Override

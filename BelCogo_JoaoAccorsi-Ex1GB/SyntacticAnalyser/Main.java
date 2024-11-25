@@ -1,7 +1,11 @@
 package SyntacticAnalyser;
 
+
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.TokenStream;
 
 import java.io.FileWriter;
 import java.io.IOException;
