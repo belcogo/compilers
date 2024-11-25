@@ -1,11 +1,8 @@
 package SyntacticAnalyser;
 
-
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
-import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.TokenStream;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,30 +15,35 @@ public class Main {
     // Lê o arquivo de entrada
     String inputFile = args[0];
     String outputFile = args[1];
+    try {
 
-    // Inicializa o Lexer e o Parser
-    SyntacticAnalyserLexer lexer = new SyntacticAnalyserLexer(inputFile);
-    CommonTokenStream tokens = new CommonTokenStream(lexer);
-    SyntacticAnalyserParser parser = new SyntacticAnalyserParser(tokens);
-
-    // Gera a árvore sintática
-    ParseTree tree = parser.prog();
-
-    // Constrói a tabela de símbolos
-    SyntacticAnalyserListener listener = new SyntacticAnalyserListener();
-    ParseTreeWalker walker = new ParseTreeWalker();
-    walker.walk(listener, tree);
-
-    // Recupera e imprime a tabela de símbolos
-    SymbolTable st = listener.getSymbolTable();
-    System.out.println("Tabela de Símbolos:");
-    // System.out.println(symbolTable);
-
-    TreeAddressCode tac = listener.getTreeAddressCode();
-    System.out.println("TAC:");
-    // System.out.println(treeAddressCode);
-
-    writeFile(outputFile, st, tac);
+      CharStream charStreamInputFile = CharStreams.fromFileName(inputFile);
+  
+  
+      // Inicializa o Lexer e o Parser
+      SyntacticAnalyserLexer lexer = new SyntacticAnalyserLexer(charStreamInputFile);
+      CommonTokenStream tokens = new CommonTokenStream(lexer);
+      SyntacticAnalyserParser parser = new SyntacticAnalyserParser(tokens);
+  
+      // Gera a árvore sintática
+      ParseTree tree = parser.prog();
+  
+      // Constrói a tabela de símbolos
+      SyntacticAnalyserFOOLIListener listener = new SyntacticAnalyserFOOLIListener();
+      ParseTreeWalker walker = new ParseTreeWalker();
+      walker.walk(listener, tree);
+  
+      // Recupera e imprime a tabela de símbolos
+      String st = listener.getSymbolTable();
+      System.out.println("Tabela de Símbolos:");
+      // System.out.println(symbolTable);
+  
+      String tac = listener.getTreeAddressCode();
+      System.out.println("TAC:");
+      // System.out.println(treeAddressCode);
+  
+      writeFile(outputFile, st, tac);
+    } catch (Exception e) {}
   }
 
   private static void writeFile(String outputFile, String st, String tac) throws IOException {
@@ -57,6 +59,6 @@ public class Main {
       writer.write("Código Intermediário (TAC):\n");
       writer.write("==============================\n");
       writer.write(tac);
-    }
-  }
+    } catch (Exception e) {}
+  } 
 }

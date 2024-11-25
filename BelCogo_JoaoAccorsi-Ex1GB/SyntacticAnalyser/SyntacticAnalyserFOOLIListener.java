@@ -1,6 +1,8 @@
 package SyntacticAnalyser;
 
-
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import SyntacticAnalyser.SyntacticAnalyserParser.*;
 
 public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListener {
@@ -269,7 +271,9 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
   }
   @Override
   public void exitRelational_op(Relational_opContext ctx) {
-    if (ctx.exp_three() != null) exitExp_three(ctx.exp_three());
+    if (ctx.exp_three() != null) {
+      // to implement
+    }
 
     if (ctx.exp_three(0) != null) {
 
