@@ -1,0 +1,37 @@
+void main() {
+    int a;
+    bool b;
+    int sum = 0;
+
+    int soma (int x, int y) {
+        return x * (1 + y);
+    }
+
+    void printSample(int value) {
+        print(value);
+    }
+
+    bool teste(bool a, bool b) {
+        if (a < b)
+          a = b;
+        ; else 
+          b = a;
+        ;
+
+        if (a == b)
+          if (b)
+            return a;
+          ;
+          else return b;;
+        ;
+        else
+          return True;
+        ;
+    }
+
+    void whileFunc(bool a) {
+      while (a) {
+        print(a);
+      }
+    }
+}

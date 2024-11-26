@@ -1,0 +1,17 @@
+class Main {
+  int val;
+  int valDois;
+
+  int funcao() {
+    while (val < valDois) val = val + 1;
+    int valTres;
+    valTres = val + valDois;
+    int soma;
+    soma = valTres + valDois;
+    return soma;
+  }
+
+  void main() {
+    if (val == valDois) return val + valDois; else return valDois;;
+  }
+}
