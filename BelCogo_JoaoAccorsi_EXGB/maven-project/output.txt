@@ -2,16 +2,27 @@
 Tabela de Símbolos:
 ==============================
 a : int
+isTrue : bool
 b : int
+printSample : void
 sum : int
 
 ==============================
 Código Intermediário (TAC):
 ==============================
 main:
-a = 1
-a = 1+1
+t0 = a = 1
+t1 = a = 1+1
 t1 = a
-b = 0
+t2 = b = 0
 t2 = b
+
+isTrue:
+t3 = a
+t4 = a<b
+t5 = t4
+RETURN t5
+
+printSample:
+GOTO [print, value]
 

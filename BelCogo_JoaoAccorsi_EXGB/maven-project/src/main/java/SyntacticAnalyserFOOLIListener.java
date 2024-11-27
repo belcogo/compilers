@@ -23,6 +23,18 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
 
   @Override
   public void enterMethod_declaration(SyntacticAnalyserParser.Method_declarationContext ctx) {
+    String type = ctx.method_type().getText();
+    String declaration = ctx.IDENTIFIER().getText();
+
+    if (st.alreadyExists(declaration)) {
+      throw new RuntimeException("Erro semântico: variável " + declaration + " já declarada.");
+    }
+
+    st.addSymbol(declaration, type);
+
+    tac.treeAddressCode.append(declaration).append(":").append("\n");
+    crawlCommands(ctx.commands());
+    tac.treeAddressCode.append("\n");
     super.enterMethod_declaration(ctx);
   }
 
@@ -65,15 +77,19 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
       visitMethodCall(ctx.method_call());
     }
     if (ctx.expression() != null) {
-      String exp = visitExpression(ctx.expression(), " ");
-      tac.treeAddressCode.append("RETURN ").append(exp);
+      if (ctx.RETURN() != null) {
+        String exp = visitExpression(ctx.expression(), "");
+        tac.treeAddressCode.append("RETURN ").append(exp).append("\n");
+      } else {
+        String exp = visitExpression(ctx.expression(), "");
+        tac.treeAddressCode.append(exp);
+      }
     }
   }
 
   private void visitAttrDeclaration(SyntacticAnalyserParser.Attr_declarationContext ctx) {
     String left = visitExpression(ctx.expression(), ctx.IDENTIFIER().getText());
     String attribution = left + " = " + ctx.IDENTIFIER().getText();
-    System.out.println(attribution);
     tac.treeAddressCode.append(attribution).append("\n");
   }
 
@@ -88,11 +104,11 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
   }
 
   private void visitIfelse(SyntacticAnalyserParser.IfelseContext ctx) {
-
+    
   }
 
   private void visitMethodCall(SyntacticAnalyserParser.Method_callContext ctx) {
-
+    tac.treeAddressCode.append("GOTO ").append(ctx.IDENTIFIER()).append("\n");
   }
 
   private String visitExpression(SyntacticAnalyserParser.ExpressionContext ctx, String variable) {
@@ -102,7 +118,7 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
     }
 
     if (ctx.boolean_op() != null) {
-      expression = handleBooleanOp(ctx.boolean_op());
+      expression = handleBooleanOp(ctx.boolean_op(), variable);
     }
     return expression;
   }
@@ -124,23 +140,33 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
         expression += operation + right;
       }
 
-      tac.treeAddressCode.append(expression).append("\n");
+      tac.treeAddressCode.append(tLabel).append(" = ").append(expression).append("\n");
       variableLabel = tLabel;
     }
 
     return variableLabel;
   }
 
-  private String handleBooleanOp(SyntacticAnalyserParser.Boolean_opContext ctx) {
+  private String handleBooleanOp(SyntacticAnalyserParser.Boolean_opContext ctx, String variable) {
     String left = extractBExpValue(ctx.b_term(0));
     String variableLabel = "";
     for (int i = 0; i < ctx.b_term().size(); i++) {
       String tLabel = tac.getLabelT();
-      String operation = ctx.getChild(2 * i - 1).getText();
-      String right = extractBExpValue(ctx.b_term(i));
+      String expression = "";
+      if (!Objects.equals(variable, "")) {
+        expression = variable + " = ";
+      }
+      expression += left;
+      if (ctx.getChild(2 * i - 1) != null) {
+        String operation = ctx.getChild(2 * i - 1).getText();
+        String right = extractBExpValue(ctx.b_term(i));
 
-      String expression = left + operation + right;
-      tac.treeAddressCode.append(expression).append("\n");
+        expression += operation + right;
+      }
+
+      System.out.println(ctx.getText());
+
+      tac.treeAddressCode.append(tLabel).append(" = ").append(expression).append("\n");
       variableLabel = tLabel;
     }
 
@@ -148,7 +174,6 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
   }
 
   private String extractAExpValue(SyntacticAnalyserParser.A_termContext ctx) {
-    System.out.println(ctx.getText());
     if (ctx.IDENTIFIER() != null) return ctx.IDENTIFIER().getText();
     if (ctx.NUMBER() != null) return ctx.NUMBER().getText();
     return ctx.getText();
@@ -159,25 +184,29 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
     String variableLabel = "";
     for (int i = 0; i < ctx.term().size(); i++) {
       String tLabel = tac.getLabelT();
-      String operation = ctx.getChild(2 * i - 1).getText();
-      String right = visitTerm(ctx.term(i));
+      String expression = left;
+      if (ctx.getChild(2 * i - 1) != null) {
+        String operation = ctx.getChild(2 * i - 1).getText();
+        String right = visitTerm(ctx.term(i));
 
-      String expression = left + operation + right;
-      tac.treeAddressCode.append(expression).append("\n");
+        expression += operation + right;
+      }
       variableLabel = tLabel;
+      tac.treeAddressCode.append(variableLabel + " = ").append(expression).append("\n");
     }
 
     return variableLabel;
   }
 
   private String visitTerm(SyntacticAnalyserParser.TermContext ctx) {
-    if (ctx.boolean_op() != null) return handleBooleanOp(ctx.boolean_op());
+    if (ctx.boolean_op() != null) return handleBooleanOp(ctx.boolean_op(), "");
 
     if (ctx.TRUE() != null) return ctx.TRUE().getText();
     if (ctx.FALSE() != null) return ctx.FALSE().getText();
     if (ctx.IDENTIFIER() != null) return ctx.IDENTIFIER().getText();
+    if (ctx.term() != null) return ctx.NOT().getText() + visitTerm(ctx.term());
 
-    return ctx.NOT().getText() + visitTerm(ctx.term());
+    return "";
   }
 
 }

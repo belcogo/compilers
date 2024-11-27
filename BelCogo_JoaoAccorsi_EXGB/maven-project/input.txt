@@ -20,7 +20,7 @@ class ClassA() {
     return a < b;
   }
 
-  void print(int value) {
+  void printSample(int value) {
     print(value);
   }
 }
