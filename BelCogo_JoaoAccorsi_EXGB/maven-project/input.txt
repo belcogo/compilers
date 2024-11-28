@@ -3,7 +3,7 @@ class ClassA() {
     int a = 1 + 1;
     int b = 0;
 
-    while (isTrue(a, b)) {
+    while (a > b) {
       int sum = a + b;
 
       if (b) {

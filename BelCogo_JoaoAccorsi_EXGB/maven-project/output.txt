@@ -2,26 +2,52 @@
 Tabela de Símbolos:
 ==============================
 a : int
-isTrue : bool
+isTrue : bool (func)
 b : int
-printSample : void
+printSample : void (func)
 sum : int
 
 ==============================
 Código Intermediário (TAC):
 ==============================
 main:
-t0 = a = 1
-t1 = a = 1+1
-t1 = a
-t2 = b = 0
-t2 = b
+t0 = 1+1
+t3 = 0
+t5 = a
+t6 = a>b
+t7 = t6
+L0:
+
+IF NOT t7 GOTO L1
+t8 = a+b
+t11 = b
+t12 = t11
+
+IF t12 GOTO L2
+GOTO L3
+L2:
+t13 = a
+t14 = t13
+
+IF t14 GOTO L4
+a = t15 = b
+GOTO L5
+L4:
+b = t17 = a
+L4: (exit)
+
+L2: (exit)
+
+ GOTO L0
+L1
+L1: (exit)
+
 
 isTrue:
-t3 = a
-t4 = a<b
-t5 = t4
-RETURN t5
+t20 = a
+t21 = a<b
+t22 = t21
+RETURN t19 = t22
 
 printSample:
 GOTO [print, value]

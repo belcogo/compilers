@@ -30,7 +30,7 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
       throw new RuntimeException("Erro semântico: variável " + declaration + " já declarada.");
     }
 
-    st.addSymbol(declaration, type);
+    st.addSymbol(declaration, type + " (func)");
 
     tac.treeAddressCode.append(declaration).append(":").append("\n");
     crawlCommands(ctx.commands());
@@ -80,31 +80,55 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
       if (ctx.RETURN() != null) {
         String exp = visitExpression(ctx.expression(), "");
         tac.treeAddressCode.append("RETURN ").append(exp).append("\n");
-      } else {
-        String exp = visitExpression(ctx.expression(), "");
-        tac.treeAddressCode.append(exp);
       }
     }
   }
 
   private void visitAttrDeclaration(SyntacticAnalyserParser.Attr_declarationContext ctx) {
-    String left = visitExpression(ctx.expression(), ctx.IDENTIFIER().getText());
-    String attribution = left + " = " + ctx.IDENTIFIER().getText();
-    tac.treeAddressCode.append(attribution).append("\n");
+    String right = visitExpression(ctx.expression(), "");
+    tac.treeAddressCode.append(right).append("\n");
   }
 
   private void visitAttribuitionOp(SyntacticAnalyserParser.Attribuition_opContext ctx) {
-    String left = visitExpression(ctx.expression(), ctx.IDENTIFIER().getText());
-    String attribution = left + " = " + ctx.IDENTIFIER().getText();
+    String right = visitExpression(ctx.expression(), "");
+    String attribution = ctx.IDENTIFIER().getText() + " = " + right;
     tac.treeAddressCode.append(attribution).append("\n");
   }
 
   private void visitWhile(SyntacticAnalyserParser.WhileContext ctx) {
+    String exp = handleBooleanOp(ctx.boolean_op(), "");
+    String labelL_while = tac.getLabelL();
+    String labelL_endWhile = tac.getLabelL();
+    tac.treeAddressCode.append(labelL_while).append(":\n")
+            .append("\nIF NOT ").append(exp).append(" GOTO ")
+            .append(labelL_endWhile).append("\n");
+    if (!ctx.commands().isEmpty()) {
+      crawlCommands(ctx.commands());
+    }
+    tac.treeAddressCode.append(" GOTO ").append(labelL_while).append("\n")
+            .append(labelL_endWhile).append("\n")
+            .append(labelL_endWhile).append(": (exit)\n\n");
+  }
 
+  private void visitElse(SyntacticAnalyserParser.ElseContext ctx) {
+    if (ctx.commands() != null) {
+      crawlCommands(ctx.commands());
+    }
   }
 
   private void visitIfelse(SyntacticAnalyserParser.IfelseContext ctx) {
-    
+    String exp = handleBooleanOp(ctx.boolean_op(), "");
+    String labelL_if = tac.getLabelL();
+    String labelL_endIf = tac.getLabelL();
+    tac.treeAddressCode.append("\nIF ").append(exp).append(" GOTO ").append(labelL_if).append("\n");
+    if (ctx.else_() != null) {
+      visitElse(ctx.else_());
+    }
+    tac.treeAddressCode.append("GOTO ").append(labelL_endIf).append("\n").append(labelL_if).append(":\n");
+    if (!ctx.commands().isEmpty()) {
+      crawlCommands(ctx.commands());
+    }
+    tac.treeAddressCode.append(labelL_if).append(": (exit)\n\n");
   }
 
   private void visitMethodCall(SyntacticAnalyserParser.Method_callContext ctx) {
@@ -112,13 +136,13 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
   }
 
   private String visitExpression(SyntacticAnalyserParser.ExpressionContext ctx, String variable) {
-    String expression = "";
+    String expression = tac.getLabelT() + " = ";
     if (ctx.aritmetic_op() != null) {
-      expression = handleAritmeticOp(ctx.aritmetic_op(), variable);
+      expression += handleAritmeticOp(ctx.aritmetic_op(), variable);
     }
 
     if (ctx.boolean_op() != null) {
-      expression = handleBooleanOp(ctx.boolean_op(), variable);
+      expression += handleBooleanOp(ctx.boolean_op(), variable);
     }
     return expression;
   }
@@ -139,9 +163,7 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
 
         expression += operation + right;
       }
-
-      tac.treeAddressCode.append(tLabel).append(" = ").append(expression).append("\n");
-      variableLabel = tLabel;
+      variableLabel = expression;
     }
 
     return variableLabel;
@@ -163,8 +185,6 @@ public class SyntacticAnalyserFOOLIListener extends SyntacticAnalyserBaseListene
 
         expression += operation + right;
       }
-
-      System.out.println(ctx.getText());
 
       tac.treeAddressCode.append(tLabel).append(" = ").append(expression).append("\n");
       variableLabel = tLabel;
